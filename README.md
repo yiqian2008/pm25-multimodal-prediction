@@ -145,8 +145,6 @@ Despite these limitations, the model demonstrates meaningful predictive capabili
 
 ---
 
----
-
 ## Notes
 
 This project focuses on building a general multimodal prediction framework that can be adapted to different domains where both image and structured data are available.
