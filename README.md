@@ -4,7 +4,9 @@
 
 Air pollution, particularly PM2.5, poses significant risks to public health. This project develops a multimodal machine learning pipeline that integrates satellite imagery and structured environmental data to predict PM2.5 levels.
 
-The goal is to explore how combining spatial information from images with structured variables (e.g., weather conditions) can improve predictive performance compared to single-modality approaches.
+The dataset is constructed over a spatial grid in Hoorn (Netherlands), where each location is associated with a satellite image tile obtained via a static map service and a set of simulated environmental variables. PM2.5 values are synthetically generated as a function of population density with added stochastic noise.
+
+The objective is to evaluate whether incorporating visual spatial information can enhance predictive performance compared to models relying solely on tabular features.
 
 ---
 
