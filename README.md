@@ -114,10 +114,6 @@ pm25-multimodal-prediction/
 
 ---
 
-## Author
-
-Your Name
-
 ---
 
 ## Notes
