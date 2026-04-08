@@ -3,7 +3,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, random_split
 from torchvision import transforms
 
-from data.dataset import HoornImageDataset
+from src.data.dataset import HoornImageDataset
 
 # reproducibility
 torch.manual_seed(42)
@@ -101,6 +101,8 @@ for epoch in range(3):
 # evaluation
 model.eval()
 total_test_loss = 0.0
+all_preds = []
+all_labels = []
 
 with torch.no_grad():
     for images, tabular, labels in test_loader:
@@ -109,8 +111,49 @@ with torch.no_grad():
         labels = labels.to(device)
 
         preds = model(images, tabular)
+
         loss = criterion(preds, labels)
         total_test_loss += loss.item()
 
-avg_test_loss = total_test_loss / len(test_loader)
-print(f"Test Loss = {avg_test_loss:.4f}")
+        all_preds.append(preds)
+        all_labels.append(labels)
+
+# concat
+all_preds = torch.cat(all_preds)
+all_labels = torch.cat(all_labels)
+
+# metrics
+mse = torch.mean((all_preds - all_labels) ** 2).item()
+mae = torch.mean(torch.abs(all_preds - all_labels)).item()
+rmse = torch.sqrt(torch.mean((all_preds - all_labels) ** 2)).item()
+
+print(f"\nEvaluation:")
+print(f"MSE: {mse:.4f}")
+print(f"RMSE: {rmse:.4f}")
+print(f"MAE: {mae:.4f}")
+
+# sample predictions
+print("\nSample predictions:")
+for i in range(5):
+    print(f"Pred: {all_preds[i].item():.2f}, True: {all_labels[i].item():.2f}")
+
+
+import matplotlib.pyplot as plt
+
+# move to cpu
+all_preds_np = all_preds.cpu().numpy()
+all_labels_np = all_labels.cpu().numpy()
+
+plt.figure()
+plt.scatter(all_labels_np, all_preds_np)
+
+# perfect prediction line
+min_val = min(all_labels_np.min(), all_preds_np.min())
+max_val = max(all_labels_np.max(), all_preds_np.max())
+plt.plot([min_val, max_val], [min_val, max_val])
+
+plt.xlabel("True PM2.5")
+plt.ylabel("Predicted PM2.5")
+plt.title("Prediction vs Ground Truth")
+
+plt.savefig("results/scatter_plot.png")

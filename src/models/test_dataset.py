@@ -1,4 +1,4 @@
-from data.dataset import HoornImageDataset
+from src.data.dataset import HoornImageDataset
 
 dataset = HoornImageDataset("data/processed/dataset.csv")
 

@@ -1,19 +1,24 @@
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, random_split
+from torchvision import transforms
 
-from data.dataset import HoornImageDataset
+from src.data.dataset import HoornImageDataset
 
-# reproducibility
 torch.manual_seed(42)
 
-# device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# load dataset
-dataset = HoornImageDataset("data/processed/dataset.csv")
+transform = transforms.Compose([
+    transforms.Resize((128, 128)),
+    transforms.ToTensor()
+])
 
-# split dataset
+dataset = HoornImageDataset(
+    "data/processed/dataset.csv",
+    transform=transform
+)
+
 train_size = int(0.8 * len(dataset))
 test_size = len(dataset) - train_size
 train_dataset, test_dataset = random_split(
@@ -22,7 +27,6 @@ train_dataset, test_dataset = random_split(
     generator=torch.Generator().manual_seed(42)
 )
 
-# dataloaders
 train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
 test_loader = DataLoader(test_dataset, batch_size=16, shuffle=False)
 
@@ -45,7 +49,6 @@ model = TabularBaseline(input_dim=1).to(device)
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
-# training loop
 for epoch in range(3):
     model.train()
     total_train_loss = 0.0
@@ -66,7 +69,6 @@ for epoch in range(3):
     avg_train_loss = total_train_loss / len(train_loader)
     print(f"Epoch {epoch + 1}: Train Loss = {avg_train_loss:.4f}")
 
-# evaluation
 model.eval()
 total_test_loss = 0.0
 
